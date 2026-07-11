@@ -1,5 +1,6 @@
 # Makefile
 
+.DELETE_ON_ERROR:
 .PHONY: all clean lint pre-commit python venv
 
 all: venv python pre-commit
