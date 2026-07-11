@@ -3,6 +3,7 @@
 import os
 import signal
 import sys
+import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -119,14 +120,22 @@ def main() -> int:
 
 if __name__ == "__main__":
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))
+    code = 1
     try:
-        with hide_interrupt_echo():
-            code = main()
-    except KeyboardInterrupt:
-        status("Interrupted.")
-        code = 130
-    except SystemExit as exc:
-        code = exc.code if isinstance(exc.code, int) else 1
-    sys.stdout.flush()
-    sys.stderr.flush()
-    os._exit(code)
+        try:
+            with hide_interrupt_echo():
+                code = main()
+        except KeyboardInterrupt:
+            status("Interrupted.")
+            code = 130
+        except SystemExit as exc:
+            if isinstance(exc.code, int):
+                code = exc.code
+            elif exc.code is None:
+                code = 0
+        except BaseException:
+            traceback.print_exc()
+        sys.stdout.flush()
+        sys.stderr.flush()
+    finally:
+        os._exit(code)
