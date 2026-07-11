@@ -1,2 +1,2 @@
-[lint]
-ignore = ["E402"]
+[lint.per-file-ignores]
+"video/*.py" = ["E402"]

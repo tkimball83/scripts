@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import signal
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -62,17 +63,25 @@ def main() -> int:
     directories = [Path(d) for d in sys.argv[1:]]
 
     rows = []
-    errors: list[str] = []
+    errors = 0
     scanned = 0
     skipped = 0
+
+    def report_error(message):
+        nonlocal errors
+        errors += 1
+        status(f"ERROR: {message}")
 
     files = []
     for directory in directories:
         if not directory.is_dir():
-            errors.append(f"not a directory: {directory}")
+            report_error(f"not a directory: {directory}")
             continue
+        walk_errors: list[str] = []
         with spinner(f"Scanning {directory}"):
-            files.extend(walk_files(directory, errors))
+            files.extend(walk_files(directory, walk_errors))
+        for message in walk_errors:
+            report_error(message)
 
     status(f"Found {len(files)} file(s) to check")
     pool = ThreadPoolExecutor(max_workers=WORKERS)
@@ -84,7 +93,7 @@ def main() -> int:
             try:
                 probed = future.result()
             except (OSError, RuntimeError, ValueError) as exc:
-                errors.append(f"{file}: {exc}")
+                report_error(f"{file}: {exc}")
                 continue
             if probed is None:
                 skipped += 1
@@ -102,8 +111,6 @@ def main() -> int:
             tabulate(rows, headers=["File", "Default", "Languages"], tablefmt="simple")
         )
 
-    for error in errors:
-        status(f"ERROR: {error}")
     status(
         f"Scanned {scanned} video file(s), skipped {skipped} non-video, flagged {len(rows)}."
     )
@@ -111,9 +118,12 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))
     try:
         with hide_interrupt_echo():
             sys.exit(main())
     except KeyboardInterrupt:
         status("Interrupted.")
+        sys.stdout.flush()
+        sys.stderr.flush()
         os._exit(130)

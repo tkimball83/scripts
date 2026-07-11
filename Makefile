@@ -1,11 +1,14 @@
 # Makefile
 
-.PHONY: all clean pre-commit python venv
+.PHONY: all clean lint pre-commit python venv
 
 all: venv python pre-commit
 
 clean:
 	$(RM) -r venv
+
+lint: python
+	venv/bin/pre-commit run --all-files
 
 pre-commit: python
 	venv/bin/pre-commit install
