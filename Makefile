@@ -7,7 +7,7 @@ all: venv python pre-commit
 clean:
 	$(RM) -r venv
 
-lint: python
+lint: venv
 	venv/bin/pre-commit run --all-files
 
 pre-commit: python

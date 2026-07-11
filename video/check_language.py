@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-import signal
 import sys
-import traceback
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -11,7 +9,8 @@ from pymediainfo import MediaInfo
 from tabulate import tabulate
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from lib.output import hide_interrupt_echo, spinner, status
+from lib.output import spinner, status
+from lib.runtime import run
 
 ENGLISH = {"en", "eng"}
 
@@ -119,37 +118,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    code = 1
-
-    def _interrupt(*_):
-        global code
-        code = 130
-        raise KeyboardInterrupt
-
-    def _terminate(*_):
-        global code
-        code = 143
-        raise SystemExit(143)
-
-    signal.signal(signal.SIGINT, _interrupt)
-    signal.signal(signal.SIGTERM, _terminate)
-    try:
-        try:
-            with hide_interrupt_echo():
-                code = main()
-        except KeyboardInterrupt:
-            code = 130
-            status("Interrupted.")
-        except SystemExit as exc:
-            if isinstance(exc.code, int):
-                code = exc.code
-            elif exc.code is None:
-                code = 0
-        except BaseException:
-            traceback.print_exc()
-        signal.signal(signal.SIGINT, lambda *_: os._exit(130))
-        signal.signal(signal.SIGTERM, lambda *_: os._exit(143))
-        sys.stdout.flush()
-        sys.stderr.flush()
-    finally:
-        os._exit(code)
+    run(main)

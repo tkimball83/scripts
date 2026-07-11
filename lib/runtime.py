@@ -1,0 +1,43 @@
+import os
+import signal
+import sys
+import traceback
+
+from .output import hide_interrupt_echo, status
+
+
+def run(main):
+    code = 1
+
+    def interrupt(*_):
+        nonlocal code
+        code = 130
+        raise KeyboardInterrupt
+
+    def terminate(*_):
+        nonlocal code
+        code = 143
+        raise SystemExit(143)
+
+    signal.signal(signal.SIGINT, interrupt)
+    signal.signal(signal.SIGTERM, terminate)
+    try:
+        try:
+            with hide_interrupt_echo():
+                code = main()
+        except KeyboardInterrupt:
+            code = 130
+            status("Interrupted.")
+        except SystemExit as exc:
+            if isinstance(exc.code, int):
+                code = exc.code
+            elif exc.code is None:
+                code = 0
+        except BaseException:
+            traceback.print_exc()
+        signal.signal(signal.SIGINT, lambda *_: os._exit(130))
+        signal.signal(signal.SIGTERM, lambda *_: os._exit(143))
+        sys.stdout.flush()
+        sys.stderr.flush()
+    finally:
+        os._exit(code)

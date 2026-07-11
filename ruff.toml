@@ -1,2 +1,5 @@
+[lint]
+extend-select = ["I"]
+
 [lint.per-file-ignores]
 "video/*.py" = ["E402"]
