@@ -3,7 +3,7 @@ import signal
 import sys
 import traceback
 
-from .output import hide_interrupt_echo, status
+from lib.output import hide_interrupt_echo, status
 
 
 def run(main):
