@@ -7,8 +7,11 @@ all: venv python pre-commit
 clean:
 	$(RM) -r venv
 
-lint: venv
+lint: venv/bin/pre-commit
 	venv/bin/pre-commit run --all-files
+
+venv/bin/pre-commit: | venv
+	venv/bin/pip install pre-commit
 
 pre-commit: python
 	venv/bin/pre-commit install
