@@ -21,3 +21,31 @@ jobs:
           python-version-file: .python-version
       - run: python -m pip install pre-commit
       - run: pre-commit run --all-files
+
+  smoke:
+    name: smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version-file: .python-version
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - run: python -m pip install -r requirements.txt
+      - run: |
+          mkdir -p /tmp/movies/eng /tmp/movies/fre
+          ffmpeg -v error -f lavfi -i testsrc=duration=1:size=64x64:rate=10 \
+            -f lavfi -i sine=frequency=440:duration=1 -map 0:v -map 1:a \
+            -metadata:s:a:0 language=eng -c:v libx264 -c:a aac \
+            "/tmp/movies/eng/English (2020).mkv"
+          ffmpeg -v error -f lavfi -i testsrc=duration=1:size=64x64:rate=10 \
+            -f lavfi -i sine=frequency=440:duration=1 -map 0:v -map 1:a \
+            -metadata:s:a:0 language=fre -c:v libx264 -c:a aac \
+            "/tmp/movies/fre/French (2019).mkv"
+      - run: |
+          code=0
+          python video/check_language.py || code=$?
+          test "$code" -eq 2
+          out=$(python video/check_language.py /tmp/movies)
+          echo "$out" | grep -q "French (2019).mkv"
+          ! echo "$out" | grep -q "English (2020).mkv"
