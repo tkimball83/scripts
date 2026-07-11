@@ -121,9 +121,12 @@ if __name__ == "__main__":
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))
     try:
         with hide_interrupt_echo():
-            sys.exit(main())
+            code = main()
     except KeyboardInterrupt:
         status("Interrupted.")
-        sys.stdout.flush()
-        sys.stderr.flush()
-        os._exit(130)
+        code = 130
+    except SystemExit as exc:
+        code = exc.code if isinstance(exc.code, int) else 1
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os._exit(code)
