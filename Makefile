@@ -10,8 +10,10 @@ clean:
 lint: venv/bin/pre-commit
 	venv/bin/pre-commit run --all-files
 
-venv/bin/pre-commit: | venv
+venv/bin/pre-commit: requirements.txt
+	test -d venv || python3 -m venv venv
 	venv/bin/pip install -r requirements.txt
+	touch venv/bin/pre-commit
 
 pre-commit: python
 	venv/bin/pre-commit install
