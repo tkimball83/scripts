@@ -126,8 +126,8 @@ if __name__ == "__main__":
             with hide_interrupt_echo():
                 code = main()
         except KeyboardInterrupt:
-            status("Interrupted.")
             code = 130
+            status("Interrupted.")
         except SystemExit as exc:
             if isinstance(exc.code, int):
                 code = exc.code
@@ -135,6 +135,8 @@ if __name__ == "__main__":
                 code = 0
         except BaseException:
             traceback.print_exc()
+        signal.signal(signal.SIGINT, lambda *_: os._exit(130))
+        signal.signal(signal.SIGTERM, lambda *_: os._exit(143))
         sys.stdout.flush()
         sys.stderr.flush()
     finally:
