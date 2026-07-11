@@ -119,8 +119,20 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))
     code = 1
+
+    def _interrupt(*_):
+        global code
+        code = 130
+        raise KeyboardInterrupt
+
+    def _terminate(*_):
+        global code
+        code = 143
+        raise SystemExit(143)
+
+    signal.signal(signal.SIGINT, _interrupt)
+    signal.signal(signal.SIGTERM, _terminate)
     try:
         try:
             with hide_interrupt_echo():
