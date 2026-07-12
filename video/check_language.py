@@ -109,9 +109,11 @@ def main() -> int:
     rows.sort()
 
     if rows:
+        print()
         print(
             tabulate(rows, headers=["File", "Default", "Languages"], tablefmt="simple")
         )
+        print()
 
     status(
         f"Scanned {scanned} video file(s), skipped {skipped} non-video, flagged {len(rows)}."
