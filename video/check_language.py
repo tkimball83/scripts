@@ -103,7 +103,7 @@ def main() -> int:
             scanned += 1
             default_lang, languages = probed
             if needs_attention(default_lang, languages):
-                rows.append((str(file), default_lang, ",".join(languages) or "-"))
+                rows.append((file.name, default_lang, ",".join(languages) or "-"))
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
     rows.sort()
