@@ -1,5 +1,7 @@
 # Makefile
 
+PYTHON ?= /usr/bin/python3
+
 .DELETE_ON_ERROR:
 .PHONY: all clean lint pre-commit python venv
 
@@ -19,7 +21,7 @@ python: venv/bin/pre-commit
 venv: venv/bin/pip
 
 venv/bin/pip:
-	python3 -m venv venv
+	$(PYTHON) -m venv venv
 
 venv/bin/pre-commit: requirements.txt | venv/bin/pip
 	venv/bin/python3 -m pip install --upgrade pip
