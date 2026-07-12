@@ -31,13 +31,17 @@ def gather_packages(host: str) -> dict[str, set[str]]:
         raise RuntimeError(detail[-1] if detail else f"ssh exited {result.returncode}")
     output = result.stdout
     packages: dict[str, set[str]] = {}
+    malformed = 0
     for line in output.splitlines():
         name, _, version = line.partition("\t")
         if not name or not version:
+            malformed += bool(line.strip())
             continue
         if name.rsplit(".", 1)[0] in IGNORED_PACKAGES:
             continue
         packages.setdefault(name, set()).add(version)
+    if malformed:
+        raise RuntimeError(f"{malformed} unrecognized line(s) in rpm output")
     return packages
 
 
