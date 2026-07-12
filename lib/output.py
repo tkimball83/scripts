@@ -16,14 +16,16 @@ def status(message):
 
 @contextmanager
 def spinner(text):
-    columns = shutil.get_terminal_size().columns
-    if not sys.stderr.isatty() or columns < len(str(text)) + SPINNER_MARGIN:
+    if not sys.stderr.isatty() or shutil.get_terminal_size().columns < SPINNER_MARGIN:
         status(text)
         yield
         return
     with yaspin(FRAMES, text=text, stream=sys.stderr) as sp:
         yield
-        sp.ok("[*]:")
+        try:
+            sp.ok("[*]:")
+        except ValueError:
+            status(text)
 
 
 @contextmanager
