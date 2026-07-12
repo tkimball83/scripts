@@ -52,7 +52,7 @@ def main() -> int:
         status(f"USAGE: {Path(sys.argv[0]).name} HOST HOST [HOST]")
         return 2
     hosts = sys.argv[1:]
-    if len(set(hosts)) != len(hosts):
+    if len(set(hosts)) != len(hosts) or any(host.startswith("-") for host in hosts):
         status(f"USAGE: {Path(sys.argv[0]).name} HOST HOST [HOST]")
         return 2
 
