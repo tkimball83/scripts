@@ -42,6 +42,8 @@ def gather_packages(host: str) -> dict[str, set[str]]:
         packages.setdefault(name, set()).add(version)
     if malformed:
         raise RuntimeError(f"{malformed} unrecognized line(s) in rpm output")
+    if not packages:
+        raise RuntimeError("empty rpm output")
     return packages
 
 
