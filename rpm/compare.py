@@ -12,10 +12,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.output import spinner, status
 from lib.runtime import run
 
-REMOTE_COMMAND = (
-    r"rpm -qa --queryformat "
-    r"'%{NAME}.%{ARCH}\t%|EPOCH?{%{EPOCH}:}:{}|%{VERSION}-%{RELEASE}\n'"
-)
+REMOTE_COMMAND = """python3 -c 'import rpm
+for h in rpm.TransactionSet().dbMatch():
+    epoch = h[rpm.RPMTAG_EPOCH]
+    prefix = "%s:" % epoch if epoch is not None else ""
+    print(
+        "%s.%s\\t%s%s-%s"
+        % (
+            h[rpm.RPMTAG_NAME],
+            h[rpm.RPMTAG_ARCH] or "(none)",
+            prefix,
+            h[rpm.RPMTAG_VERSION],
+            h[rpm.RPMTAG_RELEASE],
+        )
+    )'"""
 SSH_TIMEOUT = 120
 
 
