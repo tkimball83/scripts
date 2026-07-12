@@ -62,7 +62,7 @@ def main() -> int:
     if len(sys.argv) < 2:
         status(f"USAGE: {Path(sys.argv[0]).name} DIR [DIR ...]")
         return 2
-    directories = [Path(d) for d in sys.argv[1:]]
+    directories = list(dict.fromkeys(Path(d).resolve() for d in sys.argv[1:]))
 
     rows = []
     errors = 0
