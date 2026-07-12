@@ -4,15 +4,3 @@ updates:
     directory: /
     schedule:
       interval: weekly
-
-  - package-ecosystem: pip
-    directory: /
-    schedule:
-      interval: weekly
-    ignore:
-      - dependency-name: pre-commit
-        versions: [">=4.4"]
-      - dependency-name: tabulate
-        versions: [">=0.10"]
-      - dependency-name: yaspin
-        versions: [">=3.4"]
