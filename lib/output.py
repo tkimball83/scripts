@@ -1,3 +1,4 @@
+import shutil
 import sys
 import termios
 from contextlib import contextmanager
@@ -5,6 +6,7 @@ from contextlib import contextmanager
 from yaspin import Spinner, yaspin
 
 FRAMES = Spinner(frames=["[\\]:", "[|]:", "[/]:", "[-]:"], interval=100)
+SPINNER_MARGIN = 8
 
 
 def status(message):
@@ -14,7 +16,8 @@ def status(message):
 
 @contextmanager
 def spinner(text):
-    if not sys.stderr.isatty():
+    columns = shutil.get_terminal_size().columns
+    if not sys.stderr.isatty() or columns < len(str(text)) + SPINNER_MARGIN:
         status(text)
         yield
         return
