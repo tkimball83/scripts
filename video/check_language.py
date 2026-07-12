@@ -62,8 +62,6 @@ def main() -> int:
     if len(sys.argv) < 2:
         status(f"USAGE: {Path(sys.argv[0]).name} DIR [DIR ...]")
         return 2
-    directories = list(dict.fromkeys(Path(d).resolve() for d in sys.argv[1:]))
-
     rows = []
     errors = 0
     scanned = 0
@@ -75,9 +73,18 @@ def main() -> int:
         status(f"ERROR: {message}")
 
     files = []
-    for directory in directories:
+    seen = set()
+    for argument in sys.argv[1:]:
+        try:
+            directory = Path(argument).resolve()
+        except (OSError, RuntimeError) as exc:
+            report_error(f"{argument}: {exc}")
+            continue
+        if directory in seen:
+            continue
+        seen.add(directory)
         if not directory.is_dir():
-            report_error(f"not a directory: {directory}")
+            report_error(f"not a directory: {argument}")
             continue
         walk_errors: list[str] = []
         with spinner(f"Scanning {directory}"):
