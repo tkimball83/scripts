@@ -54,7 +54,10 @@ def walk_files(directory: Path, errors: list[str]) -> list[Path]:
     for root, _dirs, names in os.walk(
         directory, onerror=lambda e: errors.append(str(e))
     ):
-        files.extend(Path(root) / name for name in names)
+        for name in names:
+            path = Path(root) / name
+            if path.is_file():
+                files.append(path)
     return sorted(files)
 
 

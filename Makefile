@@ -20,10 +20,10 @@ python: venv/.installed
 
 venv: venv/bin/pip
 
-venv/bin/pip:
-	$(PYTHON) -m venv venv
+venv/bin/pip: .python-version
+	$(PYTHON) -m venv --clear venv
 
-venv/.installed: requirements.txt | venv/bin/pip
+venv/.installed: requirements.txt .python-version | venv/bin/pip
 	venv/bin/python3 -m pip install --upgrade pip
 	venv/bin/pip install -r requirements.txt
 	touch venv/.installed
