@@ -33,13 +33,14 @@ def hide_interrupt_echo():
     try:
         fd = sys.stdin.fileno()
         old = termios.tcgetattr(fd)
-    except (ValueError, OSError, termios.error):
+        new = termios.tcgetattr(fd)
+        new[3] &= ~termios.ECHOCTL
+    except (AttributeError, ValueError, OSError, termios.error):
         yield
         return
     try:
-        new = termios.tcgetattr(fd)
-        new[3] &= ~termios.ECHOCTL
-        termios.tcsetattr(fd, termios.TCSANOW, new)
+        with suppress(OSError, termios.error):
+            termios.tcsetattr(fd, termios.TCSANOW, new)
         yield
     finally:
         with suppress(OSError, termios.error):
