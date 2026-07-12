@@ -85,6 +85,7 @@ def main() -> int:
         for message in walk_errors:
             report_error(message)
 
+    files = sorted(set(files))
     status(f"Found {len(files)} file(s) to check")
     pool = ThreadPoolExecutor(max_workers=WORKERS)
     try:

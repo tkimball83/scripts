@@ -1,7 +1,7 @@
 import shutil
 import sys
 import termios
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 
 from yaspin import Spinner, yaspin
 
@@ -42,4 +42,5 @@ def hide_interrupt_echo():
         termios.tcsetattr(fd, termios.TCSANOW, new)
         yield
     finally:
-        termios.tcsetattr(fd, termios.TCSANOW, old)
+        with suppress(OSError, termios.error):
+            termios.tcsetattr(fd, termios.TCSANOW, old)

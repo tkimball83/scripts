@@ -1,7 +1,7 @@
 target-version = "py39"
 
 [lint]
-extend-select = ["I"]
+extend-select = ["B", "C4", "I", "SIM", "RUF"]
 
 [lint.per-file-ignores]
 "rpm/*.py" = ["E402"]

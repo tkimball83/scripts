@@ -33,6 +33,9 @@ def run(main):
                 code = exc.code
             elif exc.code is None:
                 code = 0
+            else:
+                code = 1
+                status(exc.code)
         except BaseException:
             traceback.print_exc()
         signal.signal(signal.SIGINT, lambda *_: os._exit(130))
