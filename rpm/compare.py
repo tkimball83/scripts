@@ -27,8 +27,8 @@ def gather_packages(host: str) -> dict[str, set[str]]:
         timeout=30,
     )
     if result.returncode != 0:
-        detail = result.stderr.strip().splitlines()
-        raise RuntimeError(detail[-1] if detail else f"ssh exited {result.returncode}")
+        detail = result.stderr.strip()
+        raise RuntimeError(detail or f"ssh exited {result.returncode}")
     output = result.stdout
     packages: dict[str, set[str]] = {}
     malformed = 0
