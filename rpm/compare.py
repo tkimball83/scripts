@@ -16,16 +16,15 @@ REMOTE_COMMAND = (
     r"rpm -qa --queryformat "
     r"'%{NAME}.%{ARCH}\t%|EPOCH?{%{EPOCH}:}:{}|%{VERSION}-%{RELEASE}\n'"
 )
-SSH_TIMEOUT = 30
 IGNORED_PACKAGES = {"gpg-pubkey"}
 
 
 def gather_packages(host: str) -> dict[str, set[str]]:
     result = subprocess.run(
-        ["ssh", "-o", "BatchMode=yes", host, REMOTE_COMMAND],
+        ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", host, REMOTE_COMMAND],
         capture_output=True,
         text=True,
-        timeout=SSH_TIMEOUT,
+        timeout=30,
     )
     if result.returncode != 0:
         detail = result.stderr.strip().splitlines()
