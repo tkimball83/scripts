@@ -39,7 +39,7 @@ def gather_packages(host: str) -> dict[str, set[str]]:
             continue
         if name.rsplit(".", 1)[0] in IGNORED_PACKAGES:
             continue
-        packages.setdefault(name, set()).add(version)
+        packages.setdefault(name, set()).add(version.removeprefix("0:"))
     if malformed:
         raise RuntimeError(f"{malformed} unrecognized line(s) in rpm output")
     if not packages:
