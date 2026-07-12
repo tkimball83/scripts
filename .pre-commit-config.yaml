@@ -14,5 +14,7 @@ repos:
     rev: 25.11.0
     hooks:
       - id: black
+        args:
+          - --target-version=py39
         files: \.(py)$
         verbose: true

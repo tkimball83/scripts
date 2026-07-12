@@ -47,14 +47,17 @@ def gather_packages(host: str) -> dict[str, set[str]]:
     return packages
 
 
+def usage() -> int:
+    status(f"USAGE: {Path(sys.argv[0]).name} HOST HOST [HOST]")
+    return 2
+
+
 def main() -> int:
     if not 3 <= len(sys.argv) <= 4:
-        status(f"USAGE: {Path(sys.argv[0]).name} HOST HOST [HOST]")
-        return 2
+        return usage()
     hosts = sys.argv[1:]
     if len(set(hosts)) != len(hosts) or any(host.startswith("-") for host in hosts):
-        status(f"USAGE: {Path(sys.argv[0]).name} HOST HOST [HOST]")
-        return 2
+        return usage()
 
     inventories = {}
     errors = 0
