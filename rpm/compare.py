@@ -42,7 +42,7 @@ def connect_settings(host: str) -> dict:
 def gather_packages(host: str) -> dict[str, set[str]]:
     client = paramiko.SSHClient()
     client.load_system_host_keys()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.set_missing_host_key_policy(paramiko.RejectPolicy())
     try:
         client.connect(**connect_settings(host))
         _, stdout, stderr = client.exec_command(REMOTE_COMMAND, timeout=SSH_TIMEOUT)
