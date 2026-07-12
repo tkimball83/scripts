@@ -43,8 +43,8 @@ def gather_packages(host: str) -> dict[str, set[str]]:
 
 
 def main() -> int:
-    if len(sys.argv) < 3:
-        status(f"USAGE: {Path(sys.argv[0]).name} HOST HOST [HOST ...]")
+    if not 3 <= len(sys.argv) <= 4:
+        status(f"USAGE: {Path(sys.argv[0]).name} HOST HOST [HOST]")
         return 2
     hosts = sys.argv[1:]
 
