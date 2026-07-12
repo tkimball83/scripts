@@ -58,7 +58,7 @@ def walk_files(directory: Path, errors: list[str]) -> list[Path]:
             path = Path(root) / name
             if path.is_file():
                 files.append(path)
-    return sorted(files)
+    return files
 
 
 def main() -> int:
