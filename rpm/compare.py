@@ -12,7 +12,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.output import spinner, status
 from lib.runtime import run
 
-REMOTE_COMMAND = r"rpm -qa --queryformat '%{NAME}.%{ARCH}\t%{VERSION}-%{RELEASE}\n'"
+REMOTE_COMMAND = (
+    r"rpm -qa --queryformat "
+    r"'%{NAME}.%{ARCH}\t%|EPOCH?{%{EPOCH}:}:{}|%{VERSION}-%{RELEASE}\n'"
+)
 SSH_TIMEOUT = 120
 
 
