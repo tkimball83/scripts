@@ -46,6 +46,9 @@ def main() -> int:
         status(f"USAGE: {Path(sys.argv[0]).name} HOST HOST [HOST]")
         return 2
     hosts = sys.argv[1:]
+    if len(set(hosts)) != len(hosts):
+        status(f"USAGE: {Path(sys.argv[0]).name} HOST HOST [HOST]")
+        return 2
 
     inventories = {}
     errors = 0
