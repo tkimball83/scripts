@@ -25,7 +25,11 @@ def run(main):
         try:
             with hide_interrupt_echo():
                 result = main()
-            code = result if isinstance(result, int) else 0
+            if result is None or isinstance(result, int):
+                code = result or 0
+            else:
+                code = 1
+                status(f"main() returned a non-integer: {result!r}")
         except KeyboardInterrupt:
             code = 130
             status("Interrupted.")
