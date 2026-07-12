@@ -12,11 +12,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.output import spinner, status
 from lib.runtime import run
 
+IGNORED_PACKAGES = {"gpg-pubkey"}
 REMOTE_COMMAND = (
     r"rpm -qa --queryformat "
     r"'%{NAME}.%{ARCH}\t%|EPOCH?{%{EPOCH}:}:{}|%{VERSION}-%{RELEASE}\n'"
 )
-IGNORED_PACKAGES = {"gpg-pubkey"}
 
 
 def gather_packages(host: str) -> dict[str, set[str]]:
