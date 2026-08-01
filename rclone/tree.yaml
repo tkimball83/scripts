@@ -1,0 +1,16 @@
+---
+tree:
+  - trunk: filen-crypt
+    branches:
+      - name: drime-crypt
+      - name: mega-crypt
+      - name: pcloud-na-crypt
+      - name: pcloud-us-crypt
+      - name: koofr-crypt
+        leafs:
+          - Documents
+          - Games
+          - Music
+          - Pictures
+          - Videos
+...
