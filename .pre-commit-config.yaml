@@ -18,3 +18,11 @@ repos:
           - --target-version=py39
         files: \.(py)$
         verbose: true
+
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.13.1-1
+    hooks:
+      - id: shfmt
+        args:
+          - -i=2
+          - -ci
