@@ -3,7 +3,6 @@ tree:
   - trunk: filen-crypt
     branches:
       - name: drime-crypt
-      - name: mega-crypt
       - name: pcloud-na-crypt
       - name: pcloud-eu-crypt
       - name: koofr-crypt
