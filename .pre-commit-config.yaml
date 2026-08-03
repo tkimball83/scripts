@@ -11,7 +11,7 @@ repos:
         files: \.(py)$
 
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 26.5.1
+    rev: 25.11.0  # last release supporting Python 3.9 (see .python-version)
     hooks:
       - id: black
         args:
