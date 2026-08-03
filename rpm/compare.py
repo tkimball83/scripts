@@ -25,6 +25,7 @@ def gather_packages(host: str) -> dict[str, set[str]]:
         capture_output=True,
         text=True,
         timeout=30,
+        check=False,
     )
     if result.returncode != 0:
         detail = result.stderr.strip()
