@@ -43,12 +43,14 @@ def run(main):
                 status(exc.code)
         except BaseException:
             traceback.print_exc()
-        signal.signal(signal.SIGINT, lambda *_: os._exit(130))
-        signal.signal(signal.SIGTERM, lambda *_: os._exit(143))
-        for stream in (sys.stdout, sys.stderr):
-            try:
-                stream.flush()
-            except (OSError, ValueError):
-                code = code or 1
+            raise
+        finally:
+            signal.signal(signal.SIGINT, lambda *_: os._exit(130))
+            signal.signal(signal.SIGTERM, lambda *_: os._exit(143))
+            for stream in (sys.stdout, sys.stderr):
+                try:
+                    stream.flush()
+                except (OSError, ValueError):
+                    code = code or 1
     finally:
         os._exit(code)
