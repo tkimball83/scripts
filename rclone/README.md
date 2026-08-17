@@ -11,7 +11,7 @@ A YAML-controlled bash script to sync between multiple rclone remotes.
 
 ## Usage
 
-    bash tree.sh [options]
+    ./tree.sh [options]
 
 ## Options
 
@@ -20,7 +20,7 @@ A YAML-controlled bash script to sync between multiple rclone remotes.
 | `-2` | `false`                   | Enable HTTP/2 for rclone            |
 | `-b` | `rclone`                  | Change path to rclone binary        |
 | `-c` | `null`                    | Change path to rclone config        |
-| `-d` | `false`                   | Enable dry run and command output   |
+| `-d` | `false`                   | Enable rclone dry run               |
 | `-f` | `tree.yaml`               | Change path to script config YAML   |
 | `-k` | `32`                      | Change rclone checkers setting      |
 | `-l` | `0`                       | Change rclone bandwidth limit       |
@@ -32,9 +32,9 @@ If `-c` is not provided, the script uses the first existing config at:
 
 ## Examples
 
-    bash tree.sh -d
-    bash tree.sh -2
-    bash tree.sh -k 16
-    bash tree.sh -l 100M
-    bash tree.sh -b ~/.local/bin/rclone -c ~/.config/rclone/rclone.conf
-    bash tree.sh -s /opt/homebrew/bin/shyaml
+    ./tree.sh -d
+    ./tree.sh -2
+    ./tree.sh -k 16
+    ./tree.sh -l 100M
+    ./tree.sh -b ~/.local/bin/rclone -c ~/.config/rclone/rclone.conf
+    ./tree.sh -s /opt/homebrew/bin/shyaml

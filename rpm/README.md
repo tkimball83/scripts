@@ -7,10 +7,14 @@ Compare installed RPM packages across remote systems via SSH.
 | Requirement                                            | Description               |
 | ------------------------------------------------------ | ------------------------- |
 | [tabulate](https://github.com/astanin/python-tabulate) | Pretty-print tabular data |
+| [yaspin](https://github.com/pavdmyt/yaspin)            | Terminal spinner          |
+
+Hosts must be reachable with passwordless (key-based) SSH; the script connects
+with `BatchMode=yes` and will not prompt for a password.
 
 ## Usage
 
-    python compare.py HOST HOST [HOST]
+    python compare.py HOST HOST [HOST ...]
 
 ## Examples
 

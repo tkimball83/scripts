@@ -1,33 +1,29 @@
 # Makefile
 
-PYTHON ?= /usr/bin/python3
-PYTHON_ID := $(shell $(PYTHON) -c 'import sys, platform; print(sys.executable, platform.python_version())' 2>/dev/null)
+PYTHON ?= python3
 
 .DELETE_ON_ERROR:
-.PHONY: all clean lint pre-commit python venv FORCE
+.PHONY: all check clean lint pre-commit python venv
 
-all: venv python pre-commit
+all: pre-commit
+
+check: python
+	venv/bin/python test_tools.py
 
 clean:
-	$(RM) -r venv .python-id
+	$(RM) -r venv
 
-lint: venv/.installed
+lint: python
 	venv/bin/pre-commit run --all-files
 
 pre-commit: python
 	venv/bin/pre-commit install
 
-python: venv/.installed
+python: venv/bin/pre-commit
 
-venv: venv/bin/pip
+venv: venv/bin/pre-commit
 
-.python-id: FORCE
-	@printf '%s\n' '$(PYTHON_ID)' | cmp -s - $@ || printf '%s\n' '$(PYTHON_ID)' > $@
-
-venv/bin/pip: .python-id
-	$(PYTHON) -m venv --clear venv
-
-venv/.installed: requirements.txt .python-id | venv/bin/pip
-	venv/bin/python3 -m pip install --upgrade pip
+venv/bin/pre-commit: requirements.txt
+	test -x venv/bin/python || $(PYTHON) -m venv --clear venv
 	venv/bin/pip install -r requirements.txt
-	touch venv/.installed
+	touch $@
