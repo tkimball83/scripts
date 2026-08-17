@@ -50,7 +50,7 @@ def run(main):
             for stream in (sys.stdout, sys.stderr):
                 try:
                     stream.flush()
-                except (OSError, ValueError):
+                except OSError, ValueError:
                     code = code or 1
     finally:
         os._exit(code)

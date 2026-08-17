@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-from __future__ import annotations
-
+import mimetypes
 import os
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -15,12 +14,11 @@ from lib.output import spinner, status
 from lib.runtime import run
 
 ENGLISH = {"en", "eng"}
+mimetypes.add_type("video/mp2t", ".m2ts")
 
 try:
-    WORKERS = int(os.environ.get("WORKERS", "8"))
+    WORKERS = max(1, int(os.environ.get("WORKERS", "8")))
 except ValueError:
-    WORKERS = 8
-if WORKERS < 1:
     WORKERS = 8
 
 
@@ -30,7 +28,7 @@ def probe_languages(file: Path) -> tuple[str, list[str]] | None:
         return None
     audio = [t for t in media_info.tracks if t.track_type == "Audio"]
     if not audio:
-        return "-", []
+        return None
 
     def lang(track) -> str:
         return (track.language or "und").lower()
@@ -40,7 +38,7 @@ def probe_languages(file: Path) -> tuple[str, list[str]] | None:
 
 
 def is_english(lang: str) -> bool:
-    return lang.split("-")[0] in ENGLISH
+    return lang.split("-", 1)[0] in ENGLISH
 
 
 def needs_attention(default_lang: str, languages: list[str]) -> bool:
@@ -55,9 +53,8 @@ def walk_files(directory: Path, errors: list[str]) -> list[Path]:
         directory, onerror=lambda e: errors.append(str(e))
     ):
         for name in names:
-            path = Path(root) / name
-            if path.is_file():
-                files.append(path)
+            if (mimetypes.guess_type(name)[0] or "").startswith("video/"):
+                files.append(Path(root) / name)
     return files
 
 
@@ -65,6 +62,9 @@ def main() -> int:
     if len(sys.argv) < 2:
         status(f"USAGE: {Path(sys.argv[0]).name} DIR [DIR ...]")
         return 2
+    if not MediaInfo.can_parse():
+        status("ERROR: the libmediainfo library was not found")
+        return 1
     rows = []
     errors = 0
     scanned = 0
@@ -73,6 +73,8 @@ def main() -> int:
     def report_error(message):
         nonlocal errors
         errors += 1
+        if sys.stderr.isatty():
+            print("\r\033[K", end="", file=sys.stderr)
         status(f"ERROR: {message}")
 
     files = []
@@ -80,7 +82,7 @@ def main() -> int:
     for argument in sys.argv[1:]:
         try:
             directory = Path(argument).resolve()
-        except (OSError, RuntimeError) as exc:
+        except OSError as exc:
             report_error(f"{argument}: {exc}")
             continue
         if directory in seen:
@@ -96,13 +98,18 @@ def main() -> int:
             report_error(message)
 
     files = sorted(set(files))
-    status(f"Found {len(files)} file(s) to check")
-    pool = ThreadPoolExecutor(max_workers=WORKERS)
-    try:
+    total = len(files)
+    status(f"Found {total} file(s) to check")
+    cwd = Path.cwd()
+    is_tty = sys.stderr.isatty()
+    done = 0
+    with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         futures = {pool.submit(probe_languages, file): file for file in files}
         for future in as_completed(futures):
             file = futures[future]
-            status(f"Checking {file.name}")
+            done += 1
+            if is_tty:
+                print(f"\r[*]: [{done}/{total}]", end="", file=sys.stderr)
             try:
                 probed = future.result()
             except (OSError, RuntimeError, ValueError) as exc:
@@ -114,9 +121,13 @@ def main() -> int:
             scanned += 1
             default_lang, languages = probed
             if needs_attention(default_lang, languages):
-                rows.append((file.name, default_lang, ",".join(languages) or "-"))
-    finally:
-        pool.shutdown(wait=False, cancel_futures=True)
+                try:
+                    label = str(file.relative_to(cwd))
+                except ValueError:
+                    label = str(file)
+                rows.append((label, default_lang, ",".join(languages) or "-"))
+    if is_tty:
+        print("\r\033[K", end="", file=sys.stderr)
     rows.sort()
 
     if rows:

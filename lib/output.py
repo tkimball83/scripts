@@ -35,7 +35,7 @@ def hide_interrupt_echo():
         old = termios.tcgetattr(fd)
         new = old.copy()
         new[3] &= ~termios.ECHOCTL
-    except (AttributeError, ValueError, OSError, termios.error):
+    except AttributeError, ValueError, OSError, termios.error:
         old = None
     if old is None:
         yield

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -u
 
 function fail() {
   output "ERROR: ${1}" >&2
@@ -109,7 +110,7 @@ declare -a RCLONE_CONFIG_PATHS=(
   "/etc/rclone/rclone.conf"
 )
 
-if [[ -n "${rclone_config}" ]]; then
+if [[ -n "${rclone_config-}" ]]; then
   RCLONE_CONFIG=${rclone_config}
 else
   RCLONE_CONFIG=$(resolve_rclone_config) || fail "Unable to locate rclone config."

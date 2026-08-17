@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
-from __future__ import annotations
-
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from tabulate import tabulate
@@ -49,28 +48,35 @@ def gather_packages(host: str) -> dict[str, set[str]]:
 
 
 def usage() -> int:
-    status(f"USAGE: {Path(sys.argv[0]).name} HOST HOST [HOST]")
+    status(f"USAGE: {Path(sys.argv[0]).name} HOST HOST [HOST ...]")
     return 2
 
 
 def main() -> int:
-    if not 3 <= len(sys.argv) <= 4:
+    if len(sys.argv) < 3:
         return usage()
     hosts = sys.argv[1:]
     if len(set(hosts)) != len(hosts) or any(host.startswith("-") for host in hosts):
         return usage()
 
     inventories = {}
-    errors = 0
+    errors = []
+    with (
+        spinner(f"Gathering packages from {len(hosts)} host(s)"),
+        ThreadPoolExecutor(max_workers=min(len(hosts), 8)) as pool,
+    ):
+        futures = {pool.submit(gather_packages, h): h for h in hosts}
+        for future in as_completed(futures):
+            host = futures[future]
+            try:
+                inventories[host] = future.result()
+            except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
+                errors.append(f"ERROR: {host}: {exc}")
+    for message in errors:
+        status(message)
     for host in hosts:
-        try:
-            with spinner(f"Gathering packages from {host}"):
-                inventories[host] = gather_packages(host)
-        except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
-            errors += 1
-            status(f"ERROR: {host}: {exc}")
-            continue
-        status(f"Found {len(inventories[host])} package(s) on {host}")
+        if host in inventories:
+            status(f"Found {len(inventories[host])} package(s) on {host}")
     if errors:
         return 1
 

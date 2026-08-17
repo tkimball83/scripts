@@ -1,4 +1,5 @@
 # .editorconfig
+root = true
 
 [*.sh]
 indent_size = 2

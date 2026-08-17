@@ -1,6 +1,5 @@
 *.pyc
 .env
-.python-id
 .ruff_cache/
 .venv/
 __pycache__/
